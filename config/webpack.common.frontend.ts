@@ -1,3 +1,5 @@
+import { Environment } from "./webpack";
+
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -6,8 +8,7 @@ const ScriptExtPlugin = require('script-ext-html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const { AngularCompilerPlugin } = require('@ngtools/webpack');
 
-export const getFrontendConfig = (env) => {
-    console.log(env);
+export const getFrontendConfig = (env:Environment) => {
     return {
         name: 'frontend',
         entry: {
@@ -26,7 +27,6 @@ export const getFrontendConfig = (env) => {
             rules: [
                 {
                     test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
-                    //test: /\.ts$/,
                     loader: '@ngtools/webpack',
                 },
                 {
@@ -36,8 +36,6 @@ export const getFrontendConfig = (env) => {
                             loader: 'raw-loader',
                             //loader: env.production ? MiniCssExtractPlugin.loader : 'raw-loader',
                         }, {
-                            // I'd rather use raw-loader, but that breaks source-maps
-                            // css-loader is just used to get the final code from postcss!sass to webpack
                             loader: 'css-loader',
                             options: {
                                 sourceMap: true,
@@ -63,13 +61,13 @@ export const getFrontendConfig = (env) => {
                             options: {
                                 sourceMap: true,
                                 includePaths: [
-                                    //'./frontend/*.scss'
+                                    //'./frontend/*.scss'™
                                 ]
                             }
                         },
                     ]
                 },
-
+                /*
                 {
                     test: /\.scss$/,
                     use: [
@@ -83,48 +81,6 @@ export const getFrontendConfig = (env) => {
                                 ]
                             }
                         }]
-                },
-                /*
-                {
-                    test: /\.scss$/, 
-                    use: [{
-                        loader: "style-loader"
-                    }, {
-                        loader: "css-loader"
-                    }, {
-                        loader: "sass-loader",
-                        options: {
-                            includePaths: [
-                                './public/style.scss',
-                                './public/app/***.scss'
-                            ]
-                        }
-                    }]
-                },
-                */
-                /*
-                {
-                    test: /\.(sa|sc|c)ss$/,
-                    use: [
-                        'style-loader',
-                        'css-loader',
-                        {
-                            loader: 'postcss-loader',
-                            options: {
-                                plugins: [
-                                    autoprefixer({
-                                        browsers: [
-                                            '> 1%',
-                                            'last 4 versions',
-                                            'not ie < 11',
-                                            'Firefox >= 38'
-                                        ]
-                                    }),
-                                ]
-                            }
-                        },
-                        'sass-loader',
-                    ],
                 },
                 */
                 { test: /\.css$/, loader: 'raw-loader' },
@@ -145,8 +101,6 @@ export const getFrontendConfig = (env) => {
                 { from: './frontend/favicon.ico', to: '.' }
             ]),
             new MiniCssExtractPlugin({
-                // Options similar to the same options in webpackOptions.output
-                // both options are optional
                 filename: "[name].css",
                 chunkFilename: "[id].css"
             }),

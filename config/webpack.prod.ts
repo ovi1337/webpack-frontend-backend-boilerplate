@@ -1,5 +1,6 @@
 import { getFrontendConfig } from './webpack.common.frontend';
 import { getServerConfig } from './webpack.common.server';
+import { Environment } from './webpack';
 
 const path = require('path');
 const webpack = require('webpack');
@@ -7,7 +8,7 @@ const webpackMerge = require('webpack-merge');
 const SassWebpackPlugin = require('sass-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-export const getProductionConfig = (env) => {
+export const getProductionConfig = (env:Environment) => {
   return [
     webpackMerge(getFrontendConfig(env), {
       devtool: 'source-map',
@@ -39,8 +40,6 @@ export const getProductionConfig = (env) => {
         }),
         */
         new MiniCssExtractPlugin({
-          // Options similar to the same options in webpackOptions.output
-          // both options are optional
           filename: "[name].css",
           chunkFilename: "[id].css"
         })

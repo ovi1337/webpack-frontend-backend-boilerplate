@@ -1,9 +1,11 @@
+import { Environment } from "./webpack";
+
 const path = require('path');
 const NodemonPlugin = require('nodemon-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 
-export const getServerConfig = (env) => {
+export const getServerConfig = (env:Environment) => {
     return {
         name: 'server',
         entry: './src/server.ts',

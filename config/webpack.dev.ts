@@ -1,10 +1,11 @@
 import { getFrontendConfig } from './webpack.common.frontend';
 import { getServerConfig } from './webpack.common.server';
+import { Environment } from './webpack';
 
 const path = require('path');
 const webpackMerge = require('webpack-merge');
 
-export const getDevelopmentConfig = (env) => {
+export const getDevelopmentConfig = (env:Environment) => {
     return [
         webpackMerge(getFrontendConfig(env), {
             devServer: {
