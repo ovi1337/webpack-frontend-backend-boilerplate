@@ -1,0 +1,10 @@
+# compiled project
+/build/*
+
+# Managed by npm
+/node_modules/*
+node_modules
+
+# Custom settings
+.DS_Store
+.idea/

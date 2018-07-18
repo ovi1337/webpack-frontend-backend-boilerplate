@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "outDir": "./build/public",
+    "module": "es2015",
+    "types": [
+      "node",
+    ]
+  },
+  "exclude": [
+    "src/test.ts",
+    "**/*.spec.ts"
+  ],
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": false
+  }
+}
