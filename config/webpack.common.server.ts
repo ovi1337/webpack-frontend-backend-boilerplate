@@ -11,6 +11,7 @@ export const getServerConfig = (env: Environment) => {
     const config = {
         name: 'server',
         entry: [
+            'webpack/hot/poll?1000',
             './src/server.ts',
         ],
         watch: env.watch,
