@@ -42,6 +42,8 @@ export class Server {
     }
 
     private attachHMR() {
+        console.log('HMR enabled');
+
         let currentApp = Server.app;
 
         Server.module.hot.accept(this.basePath, () => {
@@ -66,4 +68,4 @@ export class Server {
     }
 }
 
-const server = new Server();
+let server = new Server();

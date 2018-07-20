@@ -14,7 +14,7 @@ export const getServerConfig = (env: Environment) => {
             'webpack/hot/poll?1000',
             './src/server.ts',
         ],
-        watch: env.watch,
+        watch: env.watch ? true : false,
         target: 'node',
         module: {
             rules: [{
@@ -36,6 +36,10 @@ export const getServerConfig = (env: Environment) => {
             filename: 'server.js',
             path: path.resolve(__dirname, '../build')
         },
+        devServer: {
+            contentBase: path.resolve(__dirname, '../build'),
+            hot: true
+        },
         plugins: [
             new CleanWebpackPlugin(['build'], {
                 dry: false,
@@ -45,8 +49,10 @@ export const getServerConfig = (env: Environment) => {
                 ],
                 root: path.resolve(__dirname, '../'),
             }),
+            new StartServerPlugin('server.js'),
             new webpack.NamedModulesPlugin(),
             new webpack.NoEmitOnErrorsPlugin(),
+            new webpack.HotModuleReplacementPlugin(),
             new webpack.DefinePlugin({
                 "process.env": {
                     "BUILD_TARGET": JSON.stringify('server')
@@ -65,12 +71,12 @@ export const getServerConfig = (env: Environment) => {
     }
 
     if(env.watch) {
-        return webpackMerge(config, {
+        /*
+        return webpackMerge({
             plugins: [
-                new StartServerPlugin('server.js'),
-                new webpack.HotModuleReplacementPlugin(),
             ]
-        });
+        }, config);
+        */
     }
 
     return config;

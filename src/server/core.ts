@@ -26,5 +26,7 @@ export class Core {
 
     public static attachApi() {
         Core.api = new Api(Server);
+
+        Core.api.getPLCData();
     }
 }
