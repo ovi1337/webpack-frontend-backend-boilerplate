@@ -7,7 +7,7 @@
     "test": "jest --watch",
     "build:prod": "webpack --mode production --env.production",
     "build:dev": "webpack --mode development --env.development",
-    "watch": "webpack --mode development --watch --env.development",
+    "watch": "webpack --mode development --watch --env.development --env.watch",
     "start": "node build/server.js"
   },
   "author": "Florian Kapust (ovi1337) - src-one.com",

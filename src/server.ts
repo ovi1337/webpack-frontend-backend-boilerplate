@@ -8,7 +8,7 @@ export interface Module extends NodeModule {
 export class Server {
     public static app: any = express();
     public static httpServer: any;
-    public static module: Module = module;
+    private static module: Module = module;
 
     public readonly port: number = Server.app.get('port') || Number(process.env.PORT) || 3000;
     public readonly basePath = './server';
@@ -19,7 +19,7 @@ export class Server {
         Core.init();
     }
 
-    private init(port: number) {
+    private init(port: number): Promise<any> {
         Server.httpServer = Server.app.listen(port);
 
         return new Promise((resolve, reject) => {
@@ -36,30 +36,34 @@ export class Server {
             console.info(`==> 🌎 Listening on ${port}. Open up http://localhost:${port}/ in your browser.`);
 
             if (Server.module.hot) {
-                let currentApp = Server.app;
-
-                Server.module.hot.accept(this.basePath, () => {
-                    Server.httpServer.removeListener('request', currentApp);
-
-                    import(this.basePath)
-                        .then((newServer) => {
-                            currentApp = newServer.Server.app;
-                            Server.httpServer.on('request', currentApp);
-
-                            console.log('HttpServer reloaded!');
-                        })
-                        .catch(err => console.error(err));
-                });
-
-                Server.module.hot.accept(err => console.error(err));
-                Server.module.hot.dispose(() => {
-                    console.log('Disposing entry module...');
-
-                    Server.httpServer.close();
-                });
+                this.attachHMR();
             }
+        });
+    }
+
+    private attachHMR() {
+        let currentApp = Server.app;
+
+        Server.module.hot.accept(this.basePath, () => {
+            Server.httpServer.removeListener('request', currentApp);
+
+            import(this.basePath)
+                .then((newServer) => {
+                    currentApp = newServer.Server.app;
+                    Server.httpServer.on('request', currentApp);
+
+                    console.log('HttpServer reloaded!');
+                })
+                .catch(err => console.error(err));
+        });
+
+        Server.module.hot.accept(err => console.error(err));
+        Server.module.hot.dispose(() => {
+            console.log('Disposing entry module...');
+
+            Server.httpServer.close();
         });
     }
 }
 
-let server = new Server();
+const server = new Server();

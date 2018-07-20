@@ -33,6 +33,7 @@ export const getProductionConfig = (env: Environment) => {
       ]
     }),
     webpackMerge(getServerConfig(env), {
+
     })
   ];
 };

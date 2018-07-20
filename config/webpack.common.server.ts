@@ -2,17 +2,18 @@ import { Environment } from "./webpack";
 
 const path = require('path');
 const webpack = require('webpack');
+const webpackMerge = require('webpack-merge');
 const nodeExternals = require('webpack-node-externals');
-const StartServerPlugin = require('start-server-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const StartServerPlugin = require('start-server-webpack-plugin');
 
 export const getServerConfig = (env: Environment) => {
-    return {
+    const config = {
         name: 'server',
         entry: [
             './src/server.ts',
         ],
-        watch: true,
+        watch: env.watch,
         target: 'node',
         module: {
             rules: [{
@@ -24,9 +25,11 @@ export const getServerConfig = (env: Environment) => {
         resolve: {
             extensions: ['.tsx', '.ts', '.js']
         },
-        externals: [nodeExternals({
-            whitelist: ['webpack/hot/poll?1000']
-        })],
+        externals: [
+            nodeExternals({
+                whitelist: ['webpack/hot/poll?1000']
+            })
+        ],
         mode: 'development',
         output: {
             filename: 'server.js',
@@ -41,9 +44,7 @@ export const getServerConfig = (env: Environment) => {
                 ],
                 root: path.resolve(__dirname, '../'),
             }),
-            new StartServerPlugin('server.js'),
             new webpack.NamedModulesPlugin(),
-            new webpack.HotModuleReplacementPlugin(),
             new webpack.NoEmitOnErrorsPlugin(),
             new webpack.DefinePlugin({
                 "process.env": {
@@ -61,4 +62,15 @@ export const getServerConfig = (env: Environment) => {
             }),
         ],
     }
+
+    if(env.watch) {
+        return webpackMerge(config, {
+            plugins: [
+                new StartServerPlugin('server.js'),
+                new webpack.HotModuleReplacementPlugin(),
+            ]
+        });
+    }
+
+    return config;
 }

@@ -3,6 +3,8 @@ import { getProductionConfig } from './webpack.prod';
 
 export interface Environment {
     production: boolean;
+    development: boolean;
+    watch: boolean;
 };
 
 module.exports = (env: Environment) => {
