@@ -11,7 +11,7 @@ module.exports = (env: Environment) => {
 
         return getProductionConfig(env);
     }
-    
+
     process.env.NODE_ENV = process.env.ENV = 'development';
 
     return getDevelopmentConfig(env);

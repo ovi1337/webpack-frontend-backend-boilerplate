@@ -125,7 +125,7 @@ export const getFrontendConfig = (env:Environment) => {
                 sourceMap: true,
                 skipCodeGeneration: false,
                 compilerOptions: {}
-            })
+            }),
         ],
     }
 }

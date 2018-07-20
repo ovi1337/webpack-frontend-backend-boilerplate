@@ -1,34 +1,19 @@
 import { Environment } from "./webpack";
 
 const path = require('path');
-const NodemonPlugin = require('nodemon-webpack-plugin');
-const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
+const StartServerPlugin = require('start-server-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-export const getServerConfig = (env:Environment) => {
+export const getServerConfig = (env: Environment) => {
     return {
         name: 'server',
-        entry: './src/server.ts',
-        target: 'node',
-        plugins: [
-            new webpack.WatchIgnorePlugin([
-                /\.js$/,
-                /\.d\.ts$/
-            ]),
-            new NodemonPlugin({
-                args: [],
-                watch: path.resolve('./build'),
-                ignore: [
-                    '*.js.map',
-                    '*.d.ts',
-                    'public/*',
-                ],
-                verbose: true,
-                nodeArgs: ['--inspect'],
-                script: './build/server.js',
-                ext: 'js,json'
-            }),
+        entry: [
+            './src/server.ts',
         ],
+        watch: true,
+        target: 'node',
         module: {
             rules: [{
                 test: /\.tsx?$/,
@@ -39,13 +24,41 @@ export const getServerConfig = (env:Environment) => {
         resolve: {
             extensions: ['.tsx', '.ts', '.js']
         },
-        externals: [
-            nodeExternals()
-        ],
+        externals: [nodeExternals({
+            whitelist: ['webpack/hot/poll?1000']
+        })],
         mode: 'development',
         output: {
             filename: 'server.js',
             path: path.resolve(__dirname, '../build')
-        }
+        },
+        plugins: [
+            new CleanWebpackPlugin(['build'], {
+                dry: false,
+                watch: true,
+                exclude: [
+                    'public'
+                ],
+                root: path.resolve(__dirname, '../'),
+            }),
+            new StartServerPlugin('server.js'),
+            new webpack.NamedModulesPlugin(),
+            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoEmitOnErrorsPlugin(),
+            new webpack.DefinePlugin({
+                "process.env": {
+                    "BUILD_TARGET": JSON.stringify('server')
+                }
+            }),
+            new webpack.WatchIgnorePlugin([
+                /\.js$/,
+                /\.d\.ts$/
+            ]),
+            new webpack.ProvidePlugin({
+                jQuery: 'jquery',
+                $: 'jquery',
+                Plc: 'Plc',
+            }),
+        ],
     }
 }
