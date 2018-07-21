@@ -11,7 +11,6 @@ export class Server {
     private static module: Module = module;
 
     public readonly port: number = Server.app.get('port') || Number(process.env.PORT) || 3000;
-    public readonly basePath = './server';
 
     constructor() {
         this.init(this.port);
@@ -46,10 +45,10 @@ export class Server {
 
         let currentApp = Server.app;
 
-        Server.module.hot.accept(this.basePath, () => {
+        Server.module.hot.accept('./server', () => {
             Server.httpServer.removeListener('request', currentApp);
 
-            import(this.basePath)
+            import('./server')
                 .then((newServer) => {
                     currentApp = newServer.Server.app;
                     Server.httpServer.on('request', currentApp);

@@ -6,6 +6,8 @@
     ],
     "declaration": false,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "node-ads": ["../node_modules/node-ads/lib"]
+    }
   }
 }

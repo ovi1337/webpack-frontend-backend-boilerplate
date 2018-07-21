@@ -49,10 +49,8 @@ export const getServerConfig = (env: Environment) => {
                 ],
                 root: path.resolve(__dirname, '../'),
             }),
-            new StartServerPlugin('server.js'),
             new webpack.NamedModulesPlugin(),
             new webpack.NoEmitOnErrorsPlugin(),
-            new webpack.HotModuleReplacementPlugin(),
             new webpack.DefinePlugin({
                 "process.env": {
                     "BUILD_TARGET": JSON.stringify('server')
@@ -71,12 +69,12 @@ export const getServerConfig = (env: Environment) => {
     }
 
     if(env.watch) {
-        /*
-        return webpackMerge({
+        return webpackMerge(config, {
             plugins: [
+                new StartServerPlugin('server.js'),
+                new webpack.HotModuleReplacementPlugin(),
             ]
-        }, config);
-        */
+        });
     }
 
     return config;

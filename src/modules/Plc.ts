@@ -1,4 +1,5 @@
-var ads = require('node-ads')
+//var ads = require('node-ads')
+import * as ads from 'node-ads';
 
 var options = {
     //The IP or hostname of the target machine
