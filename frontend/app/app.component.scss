@@ -1,14 +1,5 @@
-div {
-    background: grey;
-}
-
-ul {
-    color: skyblue;
-
-    a {
-        color: gray;
-        text-decoration: none;
-        font-size: 14px;
-        opacity: 0.5;
-    }
+.app-content {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }

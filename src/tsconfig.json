@@ -7,7 +7,11 @@
     "declaration": false,
     "baseUrl": ".",
     "paths": {
-      "node-ads": ["../node_modules/node-ads/lib"]
+      "node-ads": ["../node_modules/node-ads/lib/"]
     }
-  }
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts"
+  ]
 }

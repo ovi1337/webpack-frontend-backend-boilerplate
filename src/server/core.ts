@@ -2,8 +2,17 @@ import * as express from 'express'
 import { Server } from '../server';
 import { Api } from './api';
 
+export class User {
+    constructor(private name: string) {}
+}
+
+export class Message {
+    constructor(private from: User, private content: string) {}
+}
+
 export class Core {
     public static api;
+    public static readonly port:number = 3000;
     private static basePath = 'build/public/';
 
     public static init(): void {

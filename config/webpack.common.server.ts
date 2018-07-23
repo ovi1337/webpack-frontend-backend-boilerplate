@@ -71,7 +71,13 @@ export const getServerConfig = (env: Environment) => {
     if(env.watch) {
         return webpackMerge(config, {
             plugins: [
-                new StartServerPlugin('server.js'),
+                new StartServerPlugin({
+                    name: 'server.js',
+                    nodeArgs: ['--inspect'], // allow debugging
+                    //args: ['scriptArgument1', 'scriptArgument2'], // pass args to script
+                    //signal: false | true | 'SIGUSR2', // signal to send for HMR (defaults to `false`, uses 'SIGUSR2' if `true`)
+                    keyboard: true, // Allow typing 'rs' to restart the server. default: only if NODE_ENV is 'development'
+                  }),
                 new webpack.HotModuleReplacementPlugin(),
             ]
         });

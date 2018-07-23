@@ -8,7 +8,7 @@ const ScriptExtPlugin = require('script-ext-html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const { AngularCompilerPlugin } = require('@ngtools/webpack');
 
-export const getFrontendConfig = (env:Environment) => {
+export const getFrontendBaseConfig = (env:Environment) => {
     return {
         name: 'frontend',
         entry: {
@@ -39,7 +39,7 @@ export const getFrontendConfig = (env:Environment) => {
                             loader: 'css-loader',
                             options: {
                                 sourceMap: true,
-                                minimize: false,
+                                minimize: env.production ? true : false,
                                 url: false,
                             }
                         }, {
@@ -60,29 +60,10 @@ export const getFrontendConfig = (env:Environment) => {
                             loader: "sass-loader",
                             options: {
                                 sourceMap: true,
-                                includePaths: [
-                                    //'./frontend/*.scss'™
-                                ]
                             }
                         },
                     ]
                 },
-                /*
-                {
-                    test: /\.scss$/,
-                    use: [
-                        MiniCssExtractPlugin.loader,
-                        {
-                            loader: "sass-loader",
-                            options: {
-                                sourceMap: true,
-                                includePaths: [
-                                    './frontend/*.scss'
-                                ]
-                            }
-                        }]
-                },
-                */
                 { test: /\.css$/, loader: 'raw-loader' },
                 { test: /\.html$/, loader: 'raw-loader' },
                 {
@@ -107,7 +88,7 @@ export const getFrontendConfig = (env:Environment) => {
             new HtmlWebpackPlugin({
                 template: './frontend/index.html',
                 favicon: './frontend/favicon.ico',
-                minify: false,
+                minify: env.production ? true : false,
                 links: [{
                     rel: 'stylesheet',
                     type: 'text/css',
@@ -128,4 +109,57 @@ export const getFrontendConfig = (env:Environment) => {
             }),
         ],
     }
-}
+};
+
+export const getFrontendStyleConfig = (env:Environment) => {
+    return {
+        entry: {
+            'styles': './frontend/styles.scss'
+        },
+        output: {
+            //filename: '_[name].css',
+            path: path.resolve(__dirname, '../build/public'),
+            chunkFilename: '[name].[chunkhash].css'
+        },
+        module: {
+            rules: [{
+                test: /\.scss$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: true,
+                            minimize: env.production ? true : false,
+                            url: false,
+                        }
+                    }, {
+                        loader: 'postcss-loader',
+                        options: {
+                            sourceMap: true,
+                            plugins: (loader) => [
+                                autoprefixer({
+                                    browsers: [
+                                        '> 1%',
+                                        'last 4 versions',
+                                        'not ie < 11',
+                                        'Firefox >= 38'
+                                    ]
+                                })
+                            ]
+                        }
+                    }, {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true,
+                            outputStyle: env.production ? 'compressed' : 'expanded',
+                        }
+                    },
+                ]
+            }],
+        },
+        plugins: [
+            new MiniCssExtractPlugin()
+        ],
+    }
+};

@@ -1,5 +1,7 @@
 //var ads = require('node-ads')
 import * as ads from 'node-ads';
+import { Module, Server } from '../server';
+import { TIMEOUT } from 'dns';
 
 var options = {
     //The IP or hostname of the target machine
@@ -23,6 +25,7 @@ var options = {
 
 export class Plc {
     public client: any;
+    public symbols: Symbol[];
 
     constructor(serviceURL: string, amsNetId: string) {
         this.connect(serviceURL, amsNetId);
@@ -31,7 +34,7 @@ export class Plc {
             console.log('notification', handle);
         });
 
-        process.on('exit', function () {
+        process.on('exit', () => {
             console.log("exit");
         });
 
@@ -44,26 +47,141 @@ export class Plc {
         this.client.on('error', (error) => {
             console.log(error);
         });
+
+        if (Server.module.hot) {
+            Server.module.hot.dispose(() => {
+                console.log('Disposing entry module...');
+
+                //this.disconnect();
+            });
+        }
     }
 
     private connect(serviceURL: string, amsNetId: string): void {
         console.log('connecting...');
 
-        this.client = ads.connect(options, () => this.connected);
+        this.client = ads.connect(options, () => {
+            console.log('connected...');
+            //this.connected();
+        });
+
+        this.connected();
+    }
+
+    private connected() {
+        console.log('connected...');
+
+        const connection = this.client.getSymbols((error, symbols) => {
+            if (error) {
+                console.log(error);
+            }
+
+            this.symbols = symbols;
+            //console.log(this.symbols);
+            console.log(this.symbols);
+
+            this.setValue('MAIN.LAMPE', false);
+
+            const brightness = 0;
+            let _value = (32767 - ((100 - brightness) / 100 * 32767));
+            this.setValue('.DIMMER', _value);
+
+            //connection.end();
+        });
+    }
+
+    private disconnect(): void {
+        console.log('disconnecting...');
+
+        this.client.end();
+    }
+
+    public setValue(symName: string, value: any): void {
+        const symbol = this.symbols.find((symbol) => {
+            return symbol.name === symName;
+        });
+
+        console.log('setValue', symName, symbol, value);
+
+        let bytelength = ads.BOOL;
+        switch (symbol.type) {
+            case 'BOOL':
+                bytelength = ads.BOOL;
+                break;
+            case 'INT16':
+                bytelength = ads.INT;
+                break;
+        }
+
+        let handle = {
+            symname: symName,
+            bytelength: bytelength,
+            propname: 'value',
+            value: value,
+        };
+
+        this.client.write(handle, function (err, handle) {
+            if (err) console.log(err)
+            //result is the myHandle object with the new properties filled in
+            console.log(handle)
+            //All handles will be released automaticly here
+            this.end();
+        });
     }
 
     public checkValues(): void {
         console.log('check values...');
 
+        /*
+        let myHandle = {
+            symname: 'MAIN.LAMPE',
+            bytelength: ads.BOOL,
+            propname: 'value',
+            value: false,
+        };
+
+        const brightness = 0;
+        let _value = (32767 - ((100 - brightness) / 100 * 32767));
+
+        let myHandle2 = {
+            symname: '.dimmer',
+            bytelength: ads.INT,
+            propname: 'value',
+            value: _value,
+        };
+
+        let myHandle3 = {
+            symname: '.lampe_global',
+            bytelength: ads.BOOL,
+            propname: 'value',
+            value: true,
+        };
+
+        let myHandle4 = {
+            symname: 'main.test',
+            bytelength: ads.BOOL,
+            propname: 'value',
+            value: false,
+        };
+
+        this.client.write(myHandle, function (err, handle) {
+            if (err) console.log(err)
+            //result is the myHandle object with the new properties filled in
+            console.log(handle)
+            //All handles will be released automaticly here
+            this.end();
+        });
+*/
         this.client.read({
             symname: '.PT_Temp_Sensor',
             bytelength: ads.INT,
         }, function (err, handle) {
             if (err) {
                 console.log(err)
+            } else {
+                console.log(handle.value);
             }
-
-            console.log(handle.value);
+            this.end();
         });
 
         this.client.read({
@@ -72,10 +190,74 @@ export class Plc {
         }, function (err, handle) {
             if (err) {
                 console.log(err)
+            } else {
+                console.log(handle.value);
             }
-            console.log(handle.value);
+            this.end();
         });
 
+        this.client.read({
+            symname: '.dimmer',
+            bytelength: ads.INT,
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle.value);
+            }
+            this.end();
+        });
+        /*
+                this.client.readDeviceInfo(function(err, result) {
+                    if (err) console.log(err)
+                    console.log(result)
+                    this.end()
+                });
+        */
+        /*
+                this.client.getSymbols(function(err, symbols) {
+                    if (err) console.log(err)
+                    console.log(symbols)
+                    this.end()
+                });
+        */
+        /*
+        this.client.write({
+            symname: '.dimmer',
+            bytelength: ads.INT,
+            value: 100,
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle.value);
+            }
+        });
+*/
+        /*
+                var myHandle = {
+                    symname: '.DI_Taster',
+                    bytelength: ads.INT,
+                    value: 50,
+                    propname: 'value' 
+                }
+        
+                var client = ads.connect(options, function() {
+                    this.write(myHandle, function(err) {
+                        if (err) 
+                            console.log(err)
+                        this.read(myHandle, function(err, handle) {
+                            if (err) {
+                                console.log(err)
+                            } else {
+                                console.log(handle.value)
+                            }
+        
+                            this.end()
+                        })
+                    })
+                })
+        */
         /*
         this.notify({
             symname: '.AI_Licht_Sensor',
@@ -102,15 +284,11 @@ export class Plc {
             });
         */
     }
-
-    private connected() {
-        console.log('connected...');
-    }
 }
 
 /*
 function () {
-            this.connection = this;
+            this.^nection = this;
             /*
             this.notify({
                 symname: '.AI_Licht_Sensor',

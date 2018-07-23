@@ -1,14 +1,18 @@
 import * as express from 'express'
-import { Core } from './server/core';
+import * as socketIo from 'socket.io';
+import * as http from 'http';
+import { Core, Message } from './server/core';
+import { AddressInfo } from 'net';
 
 export interface Module extends NodeModule {
     hot?: any;
 }
 
 export class Server {
-    public static app: any = express();
-    public static httpServer: any;
-    private static module: Module = module;
+    public static app: express.Application = express();
+    public static httpServer: http.Server;
+    public static module: Module = module;
+    public static io: SocketIO.Server;
 
     public readonly port: number = Server.app.get('port') || Number(process.env.PORT) || 3000;
 
@@ -30,13 +34,30 @@ export class Server {
 
             Server.httpServer.once('listening', () => resolve(Server.httpServer));
         }).then(httpServer => {
-            const { port } = Server.httpServer.address();
+            const { port } = Server.httpServer.address() as AddressInfo;
+            this.attachWebsocket(port);
 
             console.info(`==> 🌎 Listening on ${port}. Open up http://localhost:${port}/ in your browser.`);
-
+            
             if (Server.module.hot) {
                 this.attachHMR();
             }
+        });
+    }
+
+    private attachWebsocket(port) {
+        Server.io = socketIo().listen(Server.httpServer);
+
+        Server.io.on('connect', (socket: any) => {
+            console.log('Connected client on port %s.', port);
+            socket.on('message', (message: Message) => {
+                console.log('[server](message): %s', JSON.stringify(message));
+                Server.io.emit('message', message);
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Client disconnected');
+            });
         });
     }
 

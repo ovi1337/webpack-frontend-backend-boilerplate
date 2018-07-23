@@ -1,4 +1,4 @@
-import { getFrontendConfig } from './webpack.common.frontend';
+import { getFrontendBaseConfig, getFrontendStyleConfig } from './webpack.common.frontend';
 import { getServerConfig } from './webpack.common.server';
 import { Environment } from './webpack';
 
@@ -8,7 +8,8 @@ const webpackMerge = require('webpack-merge');
 
 export const getDevelopmentConfig = (env: Environment) => {
     return [
-        webpackMerge(getFrontendConfig(env), {
+
+        webpackMerge(getFrontendBaseConfig(env), {
             devServer: {
                 contentBase: path.join(__dirname, '../build/public'),
                 compress: true,
@@ -16,7 +17,10 @@ export const getDevelopmentConfig = (env: Environment) => {
             }
         }),
 
+        webpackMerge(getFrontendStyleConfig(env), {
+        }),
+
         webpackMerge(getServerConfig(env), {
-        })
+        }),
     ];
 };

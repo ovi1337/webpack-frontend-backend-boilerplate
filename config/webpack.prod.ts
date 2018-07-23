@@ -1,4 +1,4 @@
-import { getFrontendConfig } from './webpack.common.frontend';
+import { getFrontendBaseConfig, getFrontendStyleConfig } from './webpack.common.frontend';
 import { getServerConfig } from './webpack.common.server';
 import { Environment } from './webpack';
 
@@ -11,7 +11,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 export const getProductionConfig = (env: Environment) => {
   return [
-    webpackMerge(getFrontendConfig(env), {
+    webpackMerge(getFrontendBaseConfig(env), {
       devtool: 'source-map',
       output: {
         path: path.resolve(__dirname, '../build/public'),
@@ -32,8 +32,11 @@ export const getProductionConfig = (env: Environment) => {
         })
       ]
     }),
-    webpackMerge(getServerConfig(env), {
 
-    })
+    webpackMerge(getFrontendStyleConfig(env), {
+    }),
+
+    webpackMerge(getServerConfig(env), {
+    }),
   ];
 };
