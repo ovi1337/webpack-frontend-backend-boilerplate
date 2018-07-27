@@ -65,7 +65,7 @@ export class Plc {
             //this.connected();
         });
 
-        this.connected();
+        //this.connected();
     }
 
     private connected() {
@@ -78,13 +78,17 @@ export class Plc {
 
             this.symbols = symbols;
             //console.log(this.symbols);
-            console.log(this.symbols);
+            //console.log(this.symbols);
 
             this.setValue('MAIN.LAMPE', false);
 
             const brightness = 0;
             let _value = (32767 - ((100 - brightness) / 100 * 32767));
             this.setValue('.DIMMER', _value);
+
+
+            //this.setValue('.PT_Temp_Sensor', 0);
+            //this.setValue('.AI_Licht_Sensor', 0);
 
             //connection.end();
         });
@@ -104,6 +108,7 @@ export class Plc {
         console.log('setValue', symName, symbol, value);
 
         let bytelength = ads.BOOL;
+
         switch (symbol.type) {
             case 'BOOL':
                 bytelength = ads.BOOL;
@@ -172,6 +177,7 @@ export class Plc {
             this.end();
         });
 */
+/*
         this.client.read({
             symname: '.PT_Temp_Sensor',
             bytelength: ads.INT,
@@ -207,6 +213,85 @@ export class Plc {
             }
             this.end();
         });
+*/
+/*
+        this.client.read({
+            symname: '.PT_Temp_Sensor',
+            bytelength: ads.INT,
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle);
+            }
+            this.end();
+        });
+
+        this.client.read({
+            symname: '.AI_Licht_Sensor',
+            bytelength: ads.INT,
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle);
+            }
+            this.end();
+        });
+*/
+/*
+        this.client.read({
+            symname: 'MAIN.LAMPE',
+            bytelength: ads.BOOL,
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle);
+            }
+            this.end();
+        });
+
+        this.client.read({
+            symname: '.DIMMER',
+            bytelength: ads.UINT,
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle);
+            }
+            this.end();
+        });
+*/
+        this.client.readSymbolDesc({
+            symname: '.PT_Temp_Sensor',
+        }, function (err, handle) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(handle);
+            }
+            this.end();
+        });
+/*
+        this.client.multiRead(
+            [{
+                symname: 'MAIN.LAMPE',
+                indexGroup: 16448,
+                indexOffset: 10438,
+                bytelength: ads.BOOL,
+            }, {
+                symname: '.DIMMER',
+                indexGroup: 16448,
+                indexOffset: 26938,
+                bytelength: ads.UINT,
+            }],
+            function (err, handle) {
+                if (err) console.log(err)
+                    console.log('multiReadResult', handle)
+            });
+            */
         /*
                 this.client.readDeviceInfo(function(err, result) {
                     if (err) console.log(err)
