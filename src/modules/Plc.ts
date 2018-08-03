@@ -264,6 +264,7 @@ export class Plc {
             this.end();
         });
 */
+/*
         this.client.readSymbolDesc({
             symname: '.PT_Temp_Sensor',
         }, function (err, handle) {
@@ -274,7 +275,8 @@ export class Plc {
             }
             this.end();
         });
-/*
+*/
+
         this.client.multiRead(
             [{
                 symname: 'MAIN.LAMPE',
@@ -283,15 +285,32 @@ export class Plc {
                 bytelength: ads.BOOL,
             }, {
                 symname: '.DIMMER',
-                indexGroup: 16448,
-                indexOffset: 26938,
+                //indexGroup: 16448,
+                //indexOffset: 26938,
                 bytelength: ads.UINT,
             }],
-            function (err, handle) {
-                if (err) console.log(err)
-                    console.log('multiReadResult', handle)
+            function (err, result) {
+                if (err) {
+                    console.log(err);
+                }
+
+                if(result) {
+                    console.log('multiReadResult', result);
+                }
             });
-            */
+
+    /*
+        this.client.getHandles(
+            [{
+                symname: 'MAIN.LAMPE',
+            }, {
+                symname: '.DIMMER',
+            }],
+            function (err, handles) {
+                if (err) console.log(err)
+                    console.log('getHandles', handles)
+            });
+    */
         /*
                 this.client.readDeviceInfo(function(err, result) {
                     if (err) console.log(err)

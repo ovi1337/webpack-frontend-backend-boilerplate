@@ -5,6 +5,7 @@ export interface Environment {
     production: boolean;
     development: boolean;
     watch: boolean;
+    inspect: boolean;
 };
 
 module.exports = (env: Environment) => {
