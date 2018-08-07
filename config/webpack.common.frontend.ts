@@ -28,20 +28,12 @@ export const getFrontendBaseConfig = (env:Environment) => {
                 {
                     test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
                     loader: '@ngtools/webpack',
-                },
-                {
+                }, {
                     test: /\.scss$/,
                     use: [
                         {
                             loader: 'raw-loader',
                             //loader: env.production ? MiniCssExtractPlugin.loader : 'raw-loader',
-                        }, {
-                            loader: 'css-loader',
-                            options: {
-                                sourceMap: true,
-                                minimize: env.production ? true : false,
-                                url: false,
-                            }
                         }, {
                             loader: 'postcss-loader',
                             options: {

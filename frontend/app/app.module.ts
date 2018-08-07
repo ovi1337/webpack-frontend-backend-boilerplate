@@ -4,8 +4,8 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ChatModule } from './chat/chat.module';
 import { SharedModule } from './shared/shared.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @NgModule({
   declarations: [
@@ -15,7 +15,7 @@ import { SharedModule } from './shared/shared.module';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    ChatModule,
+    DashboardModule,
     SharedModule
   ],
   providers: [],

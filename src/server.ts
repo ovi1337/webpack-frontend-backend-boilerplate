@@ -1,8 +1,9 @@
 import * as express from 'express'
 import * as socketIo from 'socket.io';
 import * as http from 'http';
-import { Core, Message } from './server/core';
+import { Core } from './server/core';
 import { AddressInfo } from 'net';
+import { Plc } from './modules/Plc';
 
 export interface Module extends NodeModule {
     hot?: any;
@@ -50,9 +51,10 @@ export class Server {
 
         Server.io.on('connect', (socket: any) => {
             console.log('Connected client on port %s.', port);
-            socket.on('message', (message: Message) => {
-                console.log('[server](message): %s', JSON.stringify(message));
-                Server.io.emit('message', message);
+            socket.on('data', (data: Symbol) => {
+                console.log('[server](data): %s', JSON.stringify(data));
+                //Server.io.emit('data', data);
+                Core.setSymbol(data);
             });
 
             socket.on('disconnect', () => {

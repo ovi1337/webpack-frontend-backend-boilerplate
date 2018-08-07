@@ -1,0 +1,26 @@
+.button-row button {
+    margin: 0 4px;
+}
+
+table {
+    margin-bottom: 20px;
+    //width: 400px;
+}
+
+td,
+th {
+    width: 25%;
+}
+
+tr.mat-row,
+tr.mat-header-row {
+    height: 34px;
+}
+
+.dashboard-card {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+  }

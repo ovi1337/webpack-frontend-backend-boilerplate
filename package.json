@@ -9,7 +9,7 @@
     "build:dev": "webpack --mode development --env.development",
     "watch": "webpack --mode development --watch --env.development --env.watch --env.inspect",
     "start": "node build/server.js",
-    "ndb:watch" : "ndb webpack --mode development --watch --env.development --env.watch",
+    "ndb:watch": "ndb webpack --mode development --watch --env.development --env.watch",
     "ndb:start": "ndb node build/server.js --env.noinspect"
   },
   "author": "Florian Kapust (ovi1337) - src-one.com",
@@ -70,6 +70,7 @@
     "@types/socket.io": "^1.4.36",
     "core-js": "^2.5.7",
     "express": "^4.16.3",
+    "hammerjs": "^2.0.8",
     "node-ads": "^1.1.4",
     "rxjs": "^6.2.2",
     "socket.io": "^2.1.1",

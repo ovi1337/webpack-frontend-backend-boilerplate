@@ -1,23 +1,18 @@
 import * as express from 'express'
 import { Server } from '../server';
 import { Api } from './api';
-
-export class User {
-    constructor(private name: string) {}
-}
-
-export class Message {
-    constructor(private from: User, private content: string) {}
-}
+import { Plc } from '../modules/Plc';
 
 export class Core {
-    public static api;
     public static readonly port:number = 3000;
     private static basePath = 'build/public/';
+    public static api: Api;
+    public static plc: Plc;
 
     public static init(): void {
         Core.attachBaseServer();
         Core.attachApi();
+        Core.attachPlc();
     }
 
     private static attachBaseServer(): void {
@@ -35,7 +30,14 @@ export class Core {
 
     public static attachApi() {
         Core.api = new Api(Server);
+    }
 
-        Core.api.getPLCData();
+    public static attachPlc() {
+        Core.plc = new Plc('', '10.0.0.105.1.1');
+        Core.plc.checkValues();
+    }
+
+    public static setSymbol(data: Symbol) {
+        Core.plc.setValue(data.name, data.value);
     }
 }

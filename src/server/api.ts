@@ -8,10 +8,5 @@ export class Api {
             });
         });
     }
-    
-    public getPLCData() {
-        const plc = new Plc('', '10.0.0.105.1.1');
-        plc.checkValues();
-    }
 }
 

@@ -9,7 +9,7 @@ interface Options {
 
 interface Value {
     symname: string;
-    bytelength: any;
+    bytelength: number;
 }
 
 interface Callback {
@@ -17,8 +17,8 @@ interface Callback {
 }
 
 interface AdsType {
-    length: number;
     name: string;
+    length: number;
 }
 
 interface Symbol {
@@ -26,7 +26,17 @@ interface Symbol {
     indexOffset: number;
     name: string;
     type: string;
-    comment: string;
+    comment?: string;
+    value?: any;
+}
+
+interface Handle {
+    symname: string;
+    bytelength: number;
+    propname?: string;
+    indexGroup?: number,
+    indexOffset?: number,
+    value?: any;
 }
 
 interface NodeAds {
