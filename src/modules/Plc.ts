@@ -93,6 +93,31 @@ export class Plc {
 
             //connection.end();
         });
+/*
+        this.client.getHandles(
+            [{
+                symname: '.AI_LICHT_SENSOR',
+            }, {
+                symname: '.PT_TEMP_SENSOR',
+            }],
+            function (err, handles) {
+                console.log('getHandles', err, handles)
+            })
+*/
+        this.client.multiRead(
+            [{
+                symname: 'MAIN.LAMPE',
+                bytelength: ads.BOOL,
+            }, {
+                symname: '.AI_LICHT_SENSOR',
+                bytelength: ads.INT,
+            }, {
+                symname: '.PT_TEMP_SENSOR',
+                bytelength: ads.INT,
+            }],
+            function (err, handles) {
+                console.log('multiRead', err, handles)
+            })
     }
 
     private disconnect(): void {
@@ -111,11 +136,11 @@ export class Plc {
             //console.log(handle, result);
         });
 
-        
+/*
         this.getSymbolCollection(
             ['MAIN.LAMPE', '.DIMMER', '.PT_TEMP_SENSOR', '.AI_LICHT_SENSOR', '.DI_TASTER']
         );
-        
+*/
     }
 
     public getSymbolCollection(symNames: string[]): void {
@@ -144,12 +169,12 @@ export class Plc {
         console.log('check values...');
 
         this.client.notify({
-            symname: '.AI_Licht_Sensor',
+            symname: '.AI_LICHT_SENSOR',
             bytelength: ads.INT,
         });
 
         this.client.notify({
-            symname: '.PT_Temp_Sensor',
+            symname: '.PT_TEMP_SENSOR',
             bytelength: ads.INT,
         });
     }
@@ -183,7 +208,7 @@ export class Plc {
                 break;
         }
 
-        if(value !== undefined) {
+        if (value !== undefined) {
             return {
                 symname: symName,
                 bytelength: bytelength,
