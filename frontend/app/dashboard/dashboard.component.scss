@@ -1,9 +1,16 @@
-.button-row button {
+.button-row button-widget {
     margin: 0 4px;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+progressbar-widget {
+    padding-bottom: 5px;
+    display: block;
 }
 
 table {
-    margin-bottom: 20px;
+    margin-bottom: 20px; 
     //width: 400px;
 }
 
@@ -23,4 +30,4 @@ tr.mat-header-row {
     left: 15px;
     right: 15px;
     bottom: 15px;
-  }
+}

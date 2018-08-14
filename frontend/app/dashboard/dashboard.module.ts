@@ -1,19 +1,26 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaterialModule } from '../shared/material/material.module';
 import { DashboardComponent } from './dashboard.component';
 import { SocketService } from './shared/service/socket.service';
+import { SharedModule } from '../shared/shared.module';
+import { WidgetsModule } from '../shared/components/widgets.module';
+import { SliderComponent } from '../shared/components/slider.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialModule,
+    SharedModule,
+    WidgetsModule,
   ],
-  declarations: [DashboardComponent],
-  providers: [SocketService]
+  declarations: [
+    DashboardComponent,
+  ],
+  providers: [
+    SocketService,
+  ],
 })
 export class DashboardModule {
 }

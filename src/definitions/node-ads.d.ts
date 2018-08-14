@@ -8,8 +8,8 @@ interface Options {
 }
 
 interface Value {
-    symname: string;
-    bytelength: number;
+    symName: string;
+    byteLength: number;
 }
 
 interface Callback {
@@ -31,8 +31,8 @@ interface Symbol {
 }
 
 interface Handle {
-    symname: string;
-    bytelength: number;
+    symName: string;
+    byteLength: number;
     propname?: string;
     indexGroup?: number,
     indexOffset?: number,

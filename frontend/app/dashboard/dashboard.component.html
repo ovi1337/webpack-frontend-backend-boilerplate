@@ -3,23 +3,21 @@
     <mat-card class="dashboard-card">
       <mat-card-content>
         <div class="button-row">
-          <button mat-raised-button color="primary" (click)="setSymbol('MAIN.LAMPE', true)">On</button>
-          <button mat-raised-button color="primary" (click)="setSymbol('MAIN.LAMPE', false)">Off</button>
+          <button-widget symbol="MAIN.LAMPE" caption="On" value="1"></button-widget>
+          <button-widget symbol="MAIN.LAMPE" caption="Off" value="0"></button-widget>
         </div>
 
         <div>
-          <mat-slide-toggle (change)="setSymbol('MAIN.LAMPE', $event.checked)">
-            Lampe
-          </mat-slide-toggle>
+          <toggle-widget symbol="MAIN.LAMPE" caption="Lampe"></toggle-widget>
         </div>
 
-        <mat-progress-bar mode="determinate" [value]="((32767 / (32767 - symbols['.AI_Licht_Sensor']?.value)) * 100 - 100)">
-        </mat-progress-bar>
+        <progressbar-widget min="0" max="32767" symbol=".AI_LICHT_SENSOR"></progressbar-widget>
+        <progressbar-widget min="0" max="1000" symbol=".PT_TEMP_SENSOR"></progressbar-widget>
 
         <div>
-          <mat-slider min="0" max="32767" step="1" value="0" (input)="onChange('.DIMMER', $event)">
-          </mat-slider>
+          <slider-widget min="0" max="32767" step="1" symbol=".DIMMER"></slider-widget>
         </div>
+
       </mat-card-content>
       <!--
       <mat-card-actions>

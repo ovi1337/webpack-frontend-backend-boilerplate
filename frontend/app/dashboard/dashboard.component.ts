@@ -3,8 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Event } from './shared/model/event';
 import { Symbol } from './shared/model/Symbol';
 import { SocketService } from './shared/service/socket.service';
-import { Subscription } from '../../../node_modules/rxjs';
-
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'dashboard',
@@ -25,17 +24,6 @@ export class DashboardComponent implements OnInit {
   public ngOnInit(): void {
     this.initIoConnection();
     //this.setSymbol('MAIN.DIMMER', 50);
-  }
-
-  public setSymbol(name: string, value: any): void {
-    this.socketService.setSymbol({
-      name: name,
-      value: value,
-    });
-  }
-
-  public onChange(symbol: string, event: any) {
-    this.setSymbol(symbol, event.value);
   }
 
   public getValues(values) {
