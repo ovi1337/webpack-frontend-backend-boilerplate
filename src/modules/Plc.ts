@@ -2,36 +2,14 @@
 import * as ads from 'twincat-ads';
 import { Server } from '../server';
 
-var options = {
-    //The IP or hostname of the target machine
-    host: "192.168.1.174",
-    //The NetId of the target machine
-    amsNetIdTarget: "10.0.0.105.1.1",
-    //The NetId of the source machine.
-    //You can choose anything in the form of x.x.x.x.x.x,
-    //but on the target machine this must be added as a route.
-    amsNetIdSource: "192.168.137.50.1.1",
-    verbose: true,
-
-    //OPTIONAL: (These are set by default)
-    //The tcp destination port
-    //port: 48898
-    //The ams source port
-    //amsPortSource: 32905
-    //The ams target port
-    //amsPortTarget: 801
-}
-
 export class Plc {
     public client: any;
     public symbols: Symbol[];
 
-    constructor(serviceURL: string, amsNetId: string) {
-        this.connect(serviceURL, amsNetId);
+    constructor(settings: ConnectionSettings) {
+        this.connect(settings);
 
         this.client.on('notification', (result) => {
-            //console.log('notification', result, {name: result.symname, value: result.value});
-
             if (Server.io) {
                 Server.io.emit('Data', { name: result.symName, value: result.value });
             }
@@ -60,14 +38,12 @@ export class Plc {
         }
     }
 
-    private connect(serviceURL: string, amsNetId: string): void {
+    private connect(settings: ConnectionSettings): void {
         console.log('connecting...');
 
-        this.client = ads.connect(options, (client) => {
+        this.client = ads.connect(settings, (client) => {
             this.connected(client);
         });
-
-        //this.connected(this.client);
     }
 
     private connected(client: any) {
@@ -234,6 +210,11 @@ export class Plc {
 
                 if (result) {
                     console.log('multiReadResult', result);
+                    
+                    if (Server.io) {
+                        console.log('submit multiReadResult', result);
+                        Server.io.emit('Data', { name: result.symName, value: result.value });
+                    }
                 }
             });
     }
@@ -263,8 +244,8 @@ export class Plc {
     }
 
     private getSymbolByName(name: string): Symbol|undefined {
-        if(this.symbols.length === 0) {
-            console.error(`Symbol Table is empty`, name);
+        if(!this.symbols || this.symbols.length === 0) {
+            console.error(`Symbol Table is empty, can't resolve "` + name + `"`);
             return;
         }
         
@@ -275,7 +256,7 @@ export class Plc {
         //console.log(symbol);
 
         if (!symbol) {
-            console.error(`Symbol $(name) not found!`, name);
+            console.error(`Symbol "` + name + `" not found!`);
             return;
         }
 
@@ -285,10 +266,26 @@ export class Plc {
     private getHandle(symName: string, value?: any): Handle {
         const symbol: Symbol = this.getSymbolByName(symName);
 
+        if(!symbol) {
+            console.error(`Can't resolve "` + symName + `", exiting.`);
+            return;
+        }
+
+        let byteLength = ads.BOOL;
+
+        switch (symbol.type) {
+            case 'BOOL':
+                byteLength = ads.BOOL;
+                break;
+            case 'INT16':
+                byteLength = ads.INT;
+                break;
+        }
+
         if (value !== undefined) {
             return {
                 symName: symName,
-                byteLength: ads[symbol.type],
+                byteLength: byteLength,
                 propname: 'value',
                 //indexGroup: symbol.indexGroup,
                 //indexOffset: symbol.indexOffset,
@@ -298,7 +295,7 @@ export class Plc {
 
         return {
             symName: symName,
-            byteLength: ads[symbol.type],
+            byteLength: byteLength,
             indexGroup: symbol.indexGroup,
             indexOffset: symbol.indexOffset,
         };

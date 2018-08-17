@@ -2,6 +2,7 @@ import * as express from 'express'
 import { Server } from '../server';
 import { Api } from './api';
 import { Plc } from '../modules/Plc';
+import { settings } from '../config/connection';
 
 export class Core {
     public static readonly port:number = 3000;
@@ -33,7 +34,7 @@ export class Core {
     }
 
     public static attachPlc() {
-        Core.plc = new Plc('', '10.0.0.105.1.1');
+        Core.plc = new Plc(settings);
         Core.plc.checkValues();
     }
 
@@ -44,5 +45,9 @@ export class Core {
     public static updateSymbolAccessList(data: string[]) {
         console.log('updateSymbolAccessList:', data);
         Core.plc.getSymbolCollection(data);
+    }
+
+    public static cleanupSymbolAccessList() {
+        console.log('cleanupSymbolAccessList:');
     }
 }

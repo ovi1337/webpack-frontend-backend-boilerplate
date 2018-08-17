@@ -7,7 +7,7 @@
     "declaration": false,
     "baseUrl": ".",
     "paths": {
-      "node-ads": ["../node_modules/node-ads/lib/"]
+      "twincat-ads": ["../node_modules/twincat-ads/lib/"]
     }
   },
   "exclude": [

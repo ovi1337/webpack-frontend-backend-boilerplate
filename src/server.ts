@@ -60,18 +60,20 @@ export class Server {
     private attachSocketListeners(socket: Socket): void {
         socket.on('Data', (data: Symbol) => {
             console.log('[server](Data): %s', JSON.stringify(data));
-            //Server.io.emit('data', data);
+            
             Core.setSymbol(data);
         });
 
         socket.on('SymbolAccessList', (data: string[]) => {
             console.log('[server](SymbolAccessList): %s', JSON.stringify(data));
-            //Server.io.emit('data', data);
+            
             Core.updateSymbolAccessList(data);
         });
 
         socket.on('disconnect', () => {
             console.log('Client disconnected');
+
+            Core.cleanupSymbolAccessList();
         });
     }
 
