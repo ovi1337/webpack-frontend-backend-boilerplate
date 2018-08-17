@@ -17,12 +17,16 @@ export class SocketService {
     }
 
     public setSymbol(symbol: Symbol): void {
-        this.socket.emit('data', symbol);
+        this.socket.emit('Data', symbol);
+    }
+
+    public updateSymbolAccessList(symbols: string[]): void {
+        this.socket.emit('SymbolAccessList', symbols);
     }
 
     public onData(): Observable<Symbol> {
         return new Observable<Symbol>(observer => {
-            this.socket.on('data', (symbol: Symbol) => observer.next(symbol));
+            this.socket.on('Data', (symbol: Symbol) => observer.next(symbol));
         });
     }
 

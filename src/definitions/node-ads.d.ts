@@ -27,6 +27,10 @@ interface Symbol {
     name: string;
     type: string;
     comment?: string;
+    totalByteLength?: number,
+    transmissionMode?: number,
+    maxDelay?: number,
+    cycleTime?: number,
     value?: any;
 }
 

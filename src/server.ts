@@ -4,6 +4,7 @@ import * as http from 'http';
 import { Core } from './server/core';
 import { AddressInfo } from 'net';
 import { Plc } from './modules/Plc';
+import { Socket } from 'socket.io';
 
 export interface Module extends NodeModule {
     hot?: any;
@@ -46,24 +47,35 @@ export class Server {
         });
     }
 
-    private attachWebsocket(port) {
+    private attachWebsocket(port): void {
         Server.io = socketIo().listen(Server.httpServer);
 
-        Server.io.on('connect', (socket: any) => {
+        Server.io.on('connect', (socket: Socket) => {
             console.log('Connected client on port %s.', port);
-            socket.on('data', (data: Symbol) => {
-                console.log('[server](data): %s', JSON.stringify(data));
-                //Server.io.emit('data', data);
-                Core.setSymbol(data);
-            });
-
-            socket.on('disconnect', () => {
-                console.log('Client disconnected');
-            });
+            
+            this.attachSocketListeners(socket);
         });
     }
 
-    private attachHMR() {
+    private attachSocketListeners(socket: Socket): void {
+        socket.on('Data', (data: Symbol) => {
+            console.log('[server](Data): %s', JSON.stringify(data));
+            //Server.io.emit('data', data);
+            Core.setSymbol(data);
+        });
+
+        socket.on('SymbolAccessList', (data: string[]) => {
+            console.log('[server](SymbolAccessList): %s', JSON.stringify(data));
+            //Server.io.emit('data', data);
+            Core.updateSymbolAccessList(data);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Client disconnected');
+        });
+    }
+
+    private attachHMR(): void {
         console.log('HMR enabled');
 
         let currentApp = Server.app;

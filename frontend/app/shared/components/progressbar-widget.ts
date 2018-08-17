@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { SymbolService } from '../service/symbol.service';
+import { SymbolState } from '../service/symbol.state';
 
 @Component({
   selector: 'progressbar-widget',
@@ -15,7 +16,7 @@ export class ProgressbarComponent implements OnInit, OnDestroy {
   @Input() public min: number;
   @Input() public max: number;
 
-  constructor(private symbolService: SymbolService) {
+  constructor(private symbolService: SymbolService, private symbolState: SymbolState) {
   }
 
   public getValue(): number {
@@ -27,10 +28,10 @@ export class ProgressbarComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    console.log('register Symbol:', this.symbol);
+    this.symbolState.registerSymbol(this.symbol);
   }
 
   public ngOnDestroy(): void {
-    console.log('remove Symbol:', this.symbol);
+    this.symbolState.removeSymbol(this.symbol);
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { SymbolService } from '../service/symbol.service';
+import { SymbolState } from '../service/symbol.state';
 
 @Component({
   selector: 'slider-widget',
@@ -19,15 +20,15 @@ export class SliderComponent implements OnInit, OnDestroy {
   @Input() public step: number;
   @Input() public symbol: string;
 
-  constructor(private symbolService: SymbolService) {
+  constructor(private symbolService: SymbolService, private symbolState: SymbolState) {
   }
 
   public ngOnInit(): void {
-    console.log('register Symbol:', this.symbol);
+    this.symbolState.registerSymbol(this.symbol);
   }
 
   public ngOnDestroy(): void {
-    console.log('remove Symbol:', this.symbol);
+    this.symbolState.removeSymbol(this.symbol);
   }
 
   public onChange(event: any): void {

@@ -40,4 +40,9 @@ export class Core {
     public static setSymbol(data: Symbol) {
         Core.plc.setValue(data.name, data.value);
     }
+
+    public static updateSymbolAccessList(data: string[]) {
+        console.log('updateSymbolAccessList:', data);
+        Core.plc.getSymbolCollection(data);
+    }
 }

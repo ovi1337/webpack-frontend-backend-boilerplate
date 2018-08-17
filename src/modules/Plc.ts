@@ -33,7 +33,7 @@ export class Plc {
             //console.log('notification', result, {name: result.symname, value: result.value});
 
             if (Server.io) {
-                Server.io.emit('data', { name: result.symName, value: result.value });
+                Server.io.emit('Data', { name: result.symName, value: result.value });
             }
         });
 
@@ -48,7 +48,7 @@ export class Plc {
         });
 
         this.client.on('error', (error) => {
-            console.log(error);
+            console.log('TwinCAT ADS Error', error);
         });
 
         if (Server.module.hot) {
@@ -75,8 +75,10 @@ export class Plc {
 
         const connection = this.client.getSymbols((error, symbols) => {
             if (error) {
-                console.error(error);
+                console.error('getSymbols Error', error);
             }
+
+            //console.error('getSymbols', symbols);
 
             this.symbols = symbols;
             //console.log(this.symbols);
@@ -164,16 +166,15 @@ export class Plc {
                 console.log(handle.value);
 
                 if (Server.io) {
-                    Server.io.emit('data', { name: '.PT_Temp_Sensor', value: handle.value });
+                    Server.io.emit('Data', { name: '.PT_Temp_Sensor', value: handle.value });
                 }
             }
-            this.end();
         });
 
         this.client.write({
             symName: '.dimmer',
             byteLength: ads.INT,
-            value: 15000,
+            value: 0,
         }, function (error, handle) {
             if (error) {
                 console.log(error)
@@ -191,6 +192,15 @@ export class Plc {
 
     public setValue(symName: string, value: any): void {
         const handle: Handle = this.getHandle(symName, value);
+
+        console.log('handle', handle);
+
+        if(!handle.symName) {
+            console.log('Symbol not found, exiting!', symName);
+            return;
+        }
+
+        console.log('write Symbol:', symName, value);
 
         this.client.write(handle, function (error, result) {
             if (error) {
@@ -219,7 +229,7 @@ export class Plc {
             handles,
             function (err, result) {
                 if (err) {
-                    console.log(err);
+                    console.log('multiReadResult error', err);
                 }
 
                 if (result) {
@@ -252,7 +262,12 @@ export class Plc {
         });
     }
 
-    private getSymbolByName(name: string): Symbol {
+    private getSymbolByName(name: string): Symbol|undefined {
+        if(this.symbols.length === 0) {
+            console.error(`Symbol Table is empty`, name);
+            return;
+        }
+        
         const symbol: Symbol = this.symbols.find((symbol) => {
             return symbol.name === name.toUpperCase();
         });
@@ -270,21 +285,10 @@ export class Plc {
     private getHandle(symName: string, value?: any): Handle {
         const symbol: Symbol = this.getSymbolByName(symName);
 
-        let byteLength = ads.BOOL;
-
-        switch (symbol.type) {
-            case 'BOOL':
-                byteLength = ads.BOOL;
-                break;
-            case 'INT16':
-                byteLength = ads.INT;
-                break;
-        }
-
         if (value !== undefined) {
             return {
                 symName: symName,
-                byteLength: byteLength,
+                byteLength: ads[symbol.type],
                 propname: 'value',
                 //indexGroup: symbol.indexGroup,
                 //indexOffset: symbol.indexOffset,
@@ -294,7 +298,7 @@ export class Plc {
 
         return {
             symName: symName,
-            byteLength: byteLength,
+            byteLength: ads[symbol.type],
             indexGroup: symbol.indexGroup,
             indexOffset: symbol.indexOffset,
         };

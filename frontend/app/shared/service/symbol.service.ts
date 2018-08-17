@@ -8,10 +8,10 @@ import { SocketService } from '../../dashboard/shared/service/socket.service';
 @Injectable()
 export class SymbolService {
     public symbols: Symbol[] = [];
-    private ioConnection: Subscription;
+    private websocket: Subscription;
 
     constructor(private socketService: SocketService) {
-        this.initIoConnection();
+        this.initWebsocketConnection();
     }
 
     public setSymbol(name: string, value: any): void {
@@ -21,10 +21,14 @@ export class SymbolService {
         });
     }
 
-    private initIoConnection(): void {
+    public updateSymbolAccessList(symbols: string[]): void {
+        this.socketService.updateSymbolAccessList(symbols);
+    }
+
+    private initWebsocketConnection(): void {
         this.socketService.initSocket();
 
-        this.ioConnection = this.socketService.onData()
+        this.websocket = this.socketService.onData()
             .subscribe((data: Symbol) => {
                 //console.log('onData', data);
                 this.symbols[data.name] = data;

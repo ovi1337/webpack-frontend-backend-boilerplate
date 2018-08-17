@@ -8,7 +8,6 @@ const webpackMerge = require('webpack-merge');
 const SassWebpackPlugin = require('sass-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-
 export const getProductionConfig = (env: Environment) => {
   return [
     webpackMerge(getFrontendBaseConfig(env), {
