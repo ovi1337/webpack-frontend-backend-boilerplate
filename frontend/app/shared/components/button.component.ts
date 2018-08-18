@@ -28,7 +28,14 @@ export class ButtonComponent implements OnInit, OnDestroy {
   }
 
   public onChange(event: any): void {
-    console.log(this.symbol, this.value);
     this.symbolService.setSymbol(this.symbol, this.value);
+  }
+
+  public getValue(): boolean {
+    if(!(this.symbol in this.symbolService.symbols)) {
+      return false;
+    }
+
+    return this.symbolService.symbols[this.symbol].value;
   }
 }

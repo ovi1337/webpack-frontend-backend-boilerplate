@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from './material/material.module';
 import { SymbolService } from './service/symbol.service';
 import { SymbolState } from './service/symbol.state';
+import { SocketService } from './service/socket.service';
 
 @NgModule({
     imports: [
@@ -11,8 +12,9 @@ import { SymbolState } from './service/symbol.state';
     ],
     declarations: [],
     providers: [
-      SymbolService,
-      SymbolState,
+        SocketService,
+        SymbolService,
+        SymbolState,
     ],
     schemas: [
         CUSTOM_ELEMENTS_SCHEMA

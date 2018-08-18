@@ -8,7 +8,6 @@ const webpackMerge = require('webpack-merge');
 
 export const getDevelopmentConfig = (env: Environment) => {
     return [
-        /*
         webpackMerge(getFrontendBaseConfig(env), {
             devServer: {
                 contentBase: path.join(__dirname, '../build/public'),
@@ -19,7 +18,6 @@ export const getDevelopmentConfig = (env: Environment) => {
 
         webpackMerge(getFrontendStyleConfig(env), {
         }),
-        */
         webpackMerge(getServerConfig(env), {
         }),
     ];

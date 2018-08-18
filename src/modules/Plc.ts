@@ -1,4 +1,3 @@
-//var ads = require('node-ads')
 import * as ads from 'twincat-ads';
 import { Server } from '../server';
 
@@ -9,9 +8,9 @@ export class Plc {
     constructor(settings: ConnectionSettings) {
         this.connect(settings);
 
-        this.client.on('notification', (result) => {
+        this.client.on('notification', (data) => {
             if (Server.io) {
-                Server.io.emit('Data', { name: result.symName, value: result.value });
+                Server.io.emit('Data', data);
             }
         });
 
@@ -26,7 +25,7 @@ export class Plc {
         });
 
         this.client.on('error', (error) => {
-            console.log('TwinCAT ADS Error', error);
+            console.log('TwinCAT-ADS Error', error);
         });
 
         if (Server.module.hot) {
@@ -54,8 +53,6 @@ export class Plc {
                 console.error('getSymbols Error', error);
             }
 
-            //console.error('getSymbols', symbols);
-
             this.symbols = symbols;
             //console.log(this.symbols);
             /*
@@ -71,27 +68,19 @@ export class Plc {
 
             //connection.end();
         });
-        /*
-                this.client.getHandles(
-                    [{
-                        symname: '.AI_LICHT_SENSOR',
-                    }, {
-                        symname: '.PT_TEMP_SENSOR',
-                    }],
-                    function (err, handles) {
-                        console.log('getHandles', err, handles)
-                    })
-        */
 
         this.client.multiRead(
             [{
-                symName: 'MAIN.LAMPE',
+                name: 'MAIN.LAMPE',
                 byteLength: ads.BOOL,
             }, {
-                symName: '.AI_LICHT_SENSOR',
+                name: '.AI_LICHT_SENSOR',
                 byteLength: ads.INT,
             }, {
-                symName: '.PT_TEMP_SENSOR',
+                name: '.PT_TEMP_SENSOR',
+                byteLength: ads.INT,
+            }, {
+                name: '.DIMMER',
                 byteLength: ads.INT,
             }],
             function (error, handles) {
@@ -102,19 +91,19 @@ export class Plc {
                         if (handle.error) {
                             console.error('multiRead', handle.error);
                         } else {
-                            console.log('multiRead', handle.symName, handle.value);
+                            console.log('multiRead', handle.name, handle.value);
                         }
                     });
                 }
             });
-
+/*
         this.client.multiWrite(
             [{
-                symName: 'MAIN.LAMPE',
+                name: 'MAIN.LAMPE',
                 byteLength: ads.BOOL,
                 value: false,
             }, {
-                symName: '.DIMMER',
+                name: '.DIMMER',
                 byteLength: ads.INT,
                 value: 0,
             }],
@@ -126,29 +115,36 @@ export class Plc {
                         if (handle.error) {
                             console.error('multiWrite', handle.error);
                         } else {
-                            console.log('multiWrite', handle.value);
+                            console.log('multiWrite', handle.name, handle.value);
                         }
                     });
                 }
             });
-
+*/
         this.client.read({
-            symName: '.PT_TEMP_SENSOR',
+            name: '.PT_TEMP_SENSOR',
             byteLength: ads.INT,
         }, function (error, handle) {
             if (error) {
                 console.log(error)
             } else {
-                console.log(handle.value);
-
-                if (Server.io) {
-                    Server.io.emit('Data', { name: '.PT_Temp_Sensor', value: handle.value });
-                }
+                console.log(handle);
+            }
+        });
+        
+        this.client.read({
+            name: '.DIMMER',
+            byteLength: ads.INT,
+        }, function (error, handle) {
+            if (error) {
+                console.log(error)
+            } else {
+                console.log(handle);
             }
         });
 
         this.client.write({
-            symName: '.dimmer',
+            name: '.DIMMER',
             byteLength: ads.INT,
             value: 0,
         }, function (error, handle) {
@@ -166,17 +162,15 @@ export class Plc {
         this.client.end();
     }
 
-    public setValue(symName: string, value: any): void {
-        const handle: Handle = this.getHandle(symName, value);
+    public setValue(name: string, value: any): void {
+        const handle: Handle = this.getHandle(name, value);
 
-        console.log('handle', handle);
-
-        if(!handle.symName) {
-            console.log('Symbol not found, exiting!', symName);
+        if(handle && !handle.name) {
+            console.log('Symbol not found, exiting!', name);
             return;
         }
 
-        console.log('write Symbol:', symName, value);
+        //console.log('write Symbol:', name, value);
 
         this.client.write(handle, function (error, result) {
             if (error) {
@@ -184,37 +178,30 @@ export class Plc {
             }
             //console.log(handle, result);
         });
-
-        /*
-                this.getSymbolCollection(
-                    ['MAIN.LAMPE', '.DIMMER', '.PT_TEMP_SENSOR', '.AI_LICHT_SENSOR', '.DI_TASTER']
-                );
-        */
     }
 
-    public getSymbolCollection(symNames: string[]): void {
-        const handles = symNames.map((symName) => {
-            let handle = this.getHandle(symName);
+    public getSymbolCollection(names: string[]): void {
+        const handles = names.map((name) => {
+            let handle = this.getHandle(name);
 
-            return handle;
+            return {name: handle.name, byteLength: handle.byteLength};
         });
-
-        console.log('handles', handles);
 
         this.client.multiRead(
             handles,
-            function (err, result) {
+            function (err, data) {
                 if (err) {
                     console.log('multiReadResult error', err);
+                    return;
                 }
 
-                if (result) {
-                    console.log('multiReadResult', result);
-                    
-                    if (Server.io) {
-                        console.log('submit multiReadResult', result);
-                        Server.io.emit('Data', { name: result.symName, value: result.value });
-                    }
+                if (data && Server.io) {
+                    data.forEach(symbol => {
+                        Server.io.emit('Data', { 
+                            name: symbol.name, 
+                            value: symbol.value 
+                        });
+                    });
                 }
             });
     }
@@ -223,22 +210,22 @@ export class Plc {
         console.log('check values...');
 
         this.client.notify({
-            symName: '.AI_LICHT_SENSOR',
+            name: '.AI_LICHT_SENSOR',
             byteLength: ads.INT,
         });
 
         this.client.notify({
-            symName: '.PT_TEMP_SENSOR',
+            name: '.PT_TEMP_SENSOR',
             byteLength: ads.INT,
         });
 
         this.client.notify({
-            symName: '.DIMMER',
+            name: '.DIMMER',
             byteLength: ads.INT,
         });
 
         this.client.notify({
-            symName: 'MAIN.LAMPE',
+            name: 'MAIN.LAMPE',
             byteLength: ads.BOOL,
         });
     }
@@ -248,12 +235,10 @@ export class Plc {
             console.error(`Symbol Table is empty, can't resolve "` + name + `"`);
             return;
         }
-        
+
         const symbol: Symbol = this.symbols.find((symbol) => {
             return symbol.name === name.toUpperCase();
         });
-
-        //console.log(symbol);
 
         if (!symbol) {
             console.error(`Symbol "` + name + `" not found!`);
@@ -263,11 +248,11 @@ export class Plc {
         return symbol;
     }
 
-    private getHandle(symName: string, value?: any): Handle {
-        const symbol: Symbol = this.getSymbolByName(symName);
+    private getHandle(name: string, value?: any): Handle {
+        const symbol: Symbol = this.getSymbolByName(name);
 
         if(!symbol) {
-            console.error(`Can't resolve "` + symName + `", exiting.`);
+            console.error(`Can't resolve "` + name + `", exiting.`);
             return;
         }
 
@@ -284,7 +269,7 @@ export class Plc {
 
         if (value !== undefined) {
             return {
-                symName: symName,
+                name: name,
                 byteLength: byteLength,
                 propname: 'value',
                 //indexGroup: symbol.indexGroup,
@@ -294,388 +279,10 @@ export class Plc {
         }
 
         return {
-            symName: symName,
+            name: name,
             byteLength: byteLength,
             indexGroup: symbol.indexGroup,
             indexOffset: symbol.indexOffset,
         };
     }
 }
-
-
-
-        /*
-        let myHandle = {
-            symname: 'MAIN.LAMPE',
-            bytelength: ads.BOOL,
-            propname: 'value',
-            value: false,
-        };
-
-        const brightness = 0;
-        let _value = (32767 - ((100 - brightness) / 100 * 32767));
-
-        let myHandle2 = {
-            symname: '.dimmer',
-            bytelength: ads.INT,
-            propname: 'value',
-            value: _value,
-        };
-
-        let myHandle3 = {
-            symname: '.lampe_global',
-            bytelength: ads.BOOL,
-            propname: 'value',
-            value: true,
-        };
-
-        let myHandle4 = {
-            symname: 'main.test',
-            bytelength: ads.BOOL,
-            propname: 'value',
-            value: false,
-        };
-
-        this.client.write(myHandle, function (err, handle) {
-            if (err) console.log(err)
-            //result is the myHandle object with the new properties filled in
-            console.log(handle)
-            //All handles will be released automaticly here
-            this.end();
-        });
-*/
-        /*
-                this.client.read({
-                    symname: '.PT_Temp_Sensor',
-                    bytelength: ads.INT,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle.value);
-                    }
-                    this.end();
-                });
-        
-                this.client.read({
-                    symname: '.AI_Licht_Sensor',
-                    bytelength: ads.INT,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle.value);
-                    }
-                    this.end();
-                });
-        
-                this.client.read({
-                    symname: '.dimmer',
-                    bytelength: ads.INT,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle.value);
-                    }
-                    this.end();
-                });
-        */
-        /*
-                this.client.read({
-                    symname: '.PT_Temp_Sensor',
-                    bytelength: ads.INT,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle);
-                    }
-                    this.end();
-                });
-        
-                this.client.read({
-                    symname: '.AI_Licht_Sensor',
-                    bytelength: ads.INT,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle);
-                    }
-                    this.end();
-                });
-        */
-        /*
-                this.client.read({
-                    symname: 'MAIN.LAMPE',
-                    bytelength: ads.BOOL,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle);
-                    }
-                    this.end();
-                });
-        
-                this.client.read({
-                    symname: '.DIMMER',
-                    bytelength: ads.UINT,
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle);
-                    }
-                    this.end();
-                });
-        */
-        /*
-                this.client.readSymbolDesc({
-                    symname: '.PT_Temp_Sensor',
-                }, function (err, handle) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(handle);
-                    }
-                    this.end();
-                });
-        */
-        /*
-                this.client.multiRead(
-                    [{
-                        symname: 'MAIN.LAMPE',
-                        indexGroup: 16448,
-                        indexOffset: 10438,
-                        bytelength: ads.BOOL,
-                    }, {
-                        symname: '.DIMMER',
-                        indexGroup: 16448,
-                        indexOffset: 26938,
-                        bytelength: ads.UINT,
-                    }],
-                    function (err, result) {
-                        if (err) {
-                            console.log(err);
-                        }
-        
-                        if(result) {
-                            console.log('multiReadResult', result);
-                        }
-                    });
-        */
-        /*
-            this.client.getHandles(
-                [{
-                    symname: 'MAIN.LAMPE',
-                }, {
-                    symname: '.DIMMER',
-                }],
-                function (err, handles) {
-                    if (err) console.log(err)
-                        console.log('getHandles', handles)
-                });
-        */
-        /*
-                this.client.readDeviceInfo(function(err, result) {
-                    if (err) console.log(err)
-                    console.log(result)
-                    this.end()
-                });
-        */
-        /*
-                this.client.getSymbols(function(err, symbols) {
-                    if (err) console.log(err)
-                    console.log(symbols)
-                    this.end()
-                });
-        */
-        /*
-        this.client.write({
-            symname: '.dimmer',
-            bytelength: ads.INT,
-            value: 100,
-        }, function (err, handle) {
-            if (err) {
-                console.log(err)
-            } else {
-                console.log(handle.value);
-            }
-        });
-*/
-        /*
-                var myHandle = {
-                    symname: '.DI_Taster',
-                    bytelength: ads.INT,
-                    value: 50,
-                    propname: 'value' 
-                }
-        
-                var client = ads.connect(options, function() {
-                    this.write(myHandle, function(err) {
-                        if (err) 
-                            console.log(err)
-                        this.read(myHandle, function(err, handle) {
-                            if (err) {
-                                console.log(err)
-                            } else {
-                                console.log(handle.value)
-                            }
-        
-                            this.end()
-                        })
-                    })
-                })
-        */
-        /*
-        this.multiRead(
-            [{
-                symname: '.PT_Temp_Sensor',
-                bytelength: ads.INT,
-            }, {
-                symname: '.DIM_aus_Strahler',
-                bytelength: ads.INT,
-            }],
-            function (err, handle) {
-                if (err) console.log(err)
-                    console.log('multiReadResult', handle)
-            });
-        */
-/*
-function () {
-            this.^nection = this;
-            /*
-            this.notify({
-                symname: '.AI_Licht_Sensor',
-                bytelength: ads.INT,
-                //OPTIONAL: (These are set by default)       
-                //transmissionMode: ads.NOTIFY.ONCHANGE, (other option is ads.NOTIFY.CYLCIC)
-                //maxDelay: 0,  -> Latest time (in ms) after which the event has finished
-                //cycleTime: 10 -> Time (in ms) after which the PLC server checks whether the variable has changed
-            });
-            this.notify({
-                symname: '.PT_Temp_Sensor',
-                bytelength: ads.INT,
-            });
-            this.notify({
-                symname: '.DI_Taster',
-                bytelength: ads.BOOL,
-            });
-            this.read({
-                symname: '.AI_Licht_Sensor',
-                bytelength: ads.INT,
-            }, function (err, handle) {
-                if (err) console.log(err)
-                console.log(handle.value)
-            });
-            this.read({
-                symname: '.PT_Temp_Sensor',
-                bytelength: ads.INT,
-            }, function (err, handle) {
-                if (err) console.log(err)
-                console.log(handle.value)
-            });
-            this.read({
-                symname: '.DI_Taster',
-                bytelength: ads.BOOL,
-            }, function (err, handle) {
-                if (err) console.log(err)
-                console.log(handle.value)
-            });
-        */
-            /*
-            {
-                    symname: '.DO_Lampe_1',
-                    bytelength: ads.BOOL,
-                    name: '.DO_Lampe_1',
-                    readLength: ads.BOOL,
-                }, {
-                    symname: 'MAIN.test',
-                    bytelength: ads.BOOL,
-                    name: 'MAIN.test',
-                    readLength: ads.BOOL,
-                }, {
-                    symname: '.DI_Taster',
-                    bytelength: ads.BOOL,
-                    name: '.DI_Taster',
-                    readLength: ads.BOOL,
-                }, {
-                    symname: '.AI_Licht_Sensor',
-                    bytelength: ads.INT,
-                    name: '.AI_Licht_Sensor',
-                    readLength: ads.INT,
-                }, {
-                    symname: '.PT_Temp_Sensor',
-                    bytelength: ads.INT,
-                    name: '.PT_Temp_Sensor',
-                    readLength: ads.INT,
-                }, {
-                    symname: '.DIM_aus_Strahler',
-                    bytelength: ads.INT,
-                    name: '.DIM_aus_Strahler',
-                    readLength: ads.INT,
-                }, {
-                    symname: '.dimmer',
-                    bytelength: ads.INT,
-                    name: '.dimmer',
-                    readLength: ads.INT,
-                }
-        */
-/*
-            this.read({
-                symname: '.PT_Temp_Sensor',
-                bytelength: ads.INT,
-            }, function (err, handle) {
-                if (err) console.log(err)
-                console.log(handle.value)
-            });
-            this.read({
-                symname: '.AI_Licht_Sensor',
-                bytelength: ads.INT,
-            }, function (err, handle) {
-                if (err) console.log(err)
-                console.log(handle.value)
-            });
-            */
-        /*
-            this.notify({
-                symname: '.AI_Licht_Sensor',
-                bytelength: ads.INT,
-            });
-            this.notify({
-                symname: '.PT_Temp_Sensor',
-                bytelength: ads.INT,
-            });
-        */
-        /*
-            this.multiRead(
-                [{
-                    symname: '.PT_Temp_Sensor',
-                    bytelength: ads.INT,
-                }, {
-                    symname: '.DIM_aus_Strahler',
-                    bytelength: ads.INT,
-                }],
-                function (err, handle) {
-                    if (err) console.log(err)
-                        console.log('multiReadResult', handle)
-                });
-        */
-
-            /*
-            this.readDeviceInfo(function(err, result) {
-                if (err) console.log(err)
-                console.log(result)
-                this.end()
-            });
-            */
-        /*
-            this.getSymbols(function(err, symbols) {
-                if (err) console.log(err)
-                console.log(symbols)
-                //this.end()
-            });
-        }
-        */

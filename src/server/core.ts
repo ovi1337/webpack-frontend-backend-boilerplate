@@ -22,7 +22,9 @@ export class Core {
         Server.app.set('view engine', 'html');
         Server.app.set('views', Core.basePath);
 
-        Server.app.use('/', express.static(Core.basePath, { index: false }));
+        Server.app.use('/', express.static(Core.basePath, { 
+            index: false
+        }));
 
         Server.app.get('/', (req, res) => {
             res.render('./index', { req, res });

@@ -8,7 +8,7 @@ import { SymbolState } from '../service/symbol.state';
     <mat-slider [min]="min" 
                 [max]="max" 
                 [step]="step" 
-                value="0" 
+                [value]="getValue()" 
                 (input)="onChange($event)">
     </mat-slider>
   `,
@@ -32,7 +32,14 @@ export class SliderComponent implements OnInit, OnDestroy {
   }
 
   public onChange(event: any): void {
-    console.log(this.symbol, event);
     this.symbolService.setSymbol(this.symbol, event.value);
+  }
+
+  public getValue(): number {
+    if(!(this.symbol in this.symbolService.symbols)) {
+      return 0;
+    }
+
+    return this.symbolService.symbols[this.symbol].value;
   }
 }

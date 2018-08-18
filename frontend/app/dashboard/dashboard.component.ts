@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-
-import { Event } from './shared/model/event';
-import { Symbol } from './shared/model/Symbol';
-import { SocketService } from './shared/service/socket.service';
+import { Event } from '../shared/model/event';
+import { Symbol } from '../shared/model/Symbol';
+import { SocketService } from '../shared/service/socket.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -35,9 +34,7 @@ export class DashboardComponent implements OnInit {
 
     this.ioConnection = this.socketService.onData()
       .subscribe((data: Symbol) => {
-        //console.log('onData', data);
         this.symbols[data.name] = data;
-        //console.log(this.symbols);
       });
 
     this.socketService.onEvent(Event.CONNECT)

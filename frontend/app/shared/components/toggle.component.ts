@@ -5,7 +5,7 @@ import { SymbolState } from '../service/symbol.state';
 @Component({
   selector: 'toggle-widget',
   template: `
-    <mat-slide-toggle (change)="onChange($event)">
+    <mat-slide-toggle (change)="onChange($event)" [checked]="getValue()">
       {{caption}}
     </mat-slide-toggle>
   `,
@@ -27,7 +27,14 @@ export class ToggleComponent implements OnInit, OnDestroy {
   }
 
   public onChange(event: any): void {
-    console.log(this.symbol, event);
     this.symbolService.setSymbol(this.symbol, event.checked);
+  }
+
+  public getValue(): boolean {
+    if(!(this.symbol in this.symbolService.symbols)) {
+      return false;
+    }
+
+    return Boolean(this.symbolService.symbols[this.symbol].value);
   }
 }

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Observer } from 'rxjs';
-import { Symbol } from '../../dashboard/shared/model/Symbol';
-import { Event } from '../../dashboard/shared/model/event';
-import { SocketService } from '../../dashboard/shared/service/socket.service';
+import { Symbol } from '../model/Symbol';
+import { Event } from '../model/event';
+import { SocketService } from './socket.service';
 
 @Injectable()
 export class SymbolService {
@@ -30,9 +30,7 @@ export class SymbolService {
 
         this.websocket = this.socketService.onData()
             .subscribe((data: Symbol) => {
-                //console.log('onData', data);
                 this.symbols[data.name] = data;
-                //console.log(this.symbols);
             });
 
         this.socketService.onEvent(Event.CONNECT)

@@ -18,25 +18,28 @@ interface AdsType {
 }
 
 interface Symbol {
-    indexGroup?: number;
-    indexOffset?: number;
-    name: string; // ??? 
-    symName: string;
-    type: string;
-    comment?: string;
+    name: string;
+    byteLength: AdsType;
+    propname?: string[];
     totalByteLength?: number,
     transmissionMode?: number,
     maxDelay?: number,
     cycleTime?: number,
+    symHandle?: number,
     value?: any;
+    indexGroup?: number;
+    indexOffset?: number;
+    comment?: string;
+    type?: string;
 }
 
 interface Handle {
-    symName: string;
+    name: string;
     byteLength: number;
     propname?: string;
     indexGroup?: number,
     indexOffset?: number,
+    symHandle?: number,
     value?: any;
     error?: any;
 }

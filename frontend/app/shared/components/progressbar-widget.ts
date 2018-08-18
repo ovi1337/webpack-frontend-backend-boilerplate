@@ -19,19 +19,19 @@ export class ProgressbarComponent implements OnInit, OnDestroy {
   constructor(private symbolService: SymbolService, private symbolState: SymbolState) {
   }
 
-  public getValue(): number {
-    if(!(this.symbol in this.symbolService.symbols)) {
-      return 0;
-    }
-
-    return (this.max / (this.max - this.symbolService.symbols[this.symbol].value)) * 100 - 100
-  }
-
   public ngOnInit(): void {
     this.symbolState.registerSymbol(this.symbol);
   }
 
   public ngOnDestroy(): void {
     this.symbolState.removeSymbol(this.symbol);
+  }
+
+  public getValue(): number {
+    if(!(this.symbol in this.symbolService.symbols)) {
+      return 0;
+    }
+
+    return (this.max / (this.max - this.symbolService.symbols[this.symbol].value)) * 100 - 100
   }
 }
