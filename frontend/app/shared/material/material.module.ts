@@ -16,6 +16,7 @@ import {
   MatTableModule,
   MatProgressBarModule,
   MatGridListModule,
+  MatChipsModule,
 } from '@angular/material';
 
 const modules = [
@@ -33,6 +34,7 @@ const modules = [
   MatTableModule,
   MatProgressBarModule,
   MatGridListModule,
+  MatChipsModule,
 ];
 
 @NgModule({

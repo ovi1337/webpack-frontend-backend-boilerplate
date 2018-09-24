@@ -4,6 +4,7 @@ import { MaterialModule } from './material/material.module';
 import { SymbolService } from './service/symbol.service';
 import { SymbolState } from './service/symbol.state';
 import { SocketService } from './service/socket.service';
+import { SystemState } from './service/system.state';
 
 @NgModule({
     imports: [
@@ -15,6 +16,7 @@ import { SocketService } from './service/socket.service';
         SocketService,
         SymbolService,
         SymbolState,
+        SystemState,
     ],
     schemas: [
         CUSTOM_ELEMENTS_SCHEMA

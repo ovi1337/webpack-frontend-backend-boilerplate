@@ -37,7 +37,7 @@ export class Core {
 
     public static attachPlc() {
         Core.plc = new Plc(settings);
-        Core.plc.checkValues();
+        //Core.plc.checkValues();
     }
 
     public static setSymbol(data: Symbol) {
@@ -46,10 +46,14 @@ export class Core {
 
     public static updateSymbolAccessList(data: string[]) {
         console.log('updateSymbolAccessList:', data);
+
         Core.plc.getSymbolCollection(data);
+        //Core.plc.attachNotifications();
     }
 
     public static cleanupSymbolAccessList() {
         console.log('cleanupSymbolAccessList:');
+        
+        //Core.plc.cleanupNotifications();
     }
 }

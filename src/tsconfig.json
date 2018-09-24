@@ -6,9 +6,6 @@
     ],
     "declaration": false,
     "baseUrl": ".",
-    "paths": {
-      "twincat-ads": ["../node_modules/twincat-ads/lib/"]
-    }
   },
   "exclude": [
     "test.ts",

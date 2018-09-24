@@ -11,12 +11,16 @@ const SERVER_URL = 'http://localhost:3000';
 export class SocketService {
     private socket;
 
+    constructor() {
+        this.initSocket();
+    }
+
     public initSocket(): void {
         this.socket = socketIo(SERVER_URL);
     }
 
     public setSymbol(symbol: Symbol): void {
-        this.socket.emit('Data', symbol);
+        this.socket.emit('Symbol', symbol);
     }
 
     public updateSymbolAccessList(symbols: string[]): void {
@@ -25,7 +29,7 @@ export class SocketService {
 
     public onData(): Observable<Symbol> {
         return new Observable<Symbol>(observer => {
-            this.socket.on('Data', (symbol: Symbol) => observer.next(symbol));
+            this.socket.on('Symbol', (symbol: Symbol) => observer.next(symbol));
         });
     }
 

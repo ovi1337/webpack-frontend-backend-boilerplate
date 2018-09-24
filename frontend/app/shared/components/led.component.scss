@@ -1,0 +1,106 @@
+$c-led: #adf;
+$c-led-red: rgb(239, 11, 11);
+$c-led-green: #07de0c;
+$c-led-yellow: #f9db0b;
+$c-led-blue: #007bff;
+
+.led-wrapper {
+    padding: 10px;
+    text-align: center;
+    float: left;
+    margin: auto;
+  }
+
+.led {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #333;
+    display: inline-block;
+    position: relative;
+    transition: all .3s ease-in-out;
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.2) inset, 
+                0 2px 0px rgba(255, 255, 255, 0.3), 
+                0 -1px 0px rgba(0, 0, 0, 0.3);
+    
+    &:before {
+      position: absolute;
+      content: '';
+      top: 2px;
+      left: 3px;
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+    }
+  }
+
+.led--enabled {
+    &.led--red {
+        background: $c-led-red;
+        //box-shadow: 0 0px 10px $c-led-red;
+        
+        box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.2) inset, 
+                    0 2px 0px rgba(255, 255, 255, 0.3), 
+                    0 -1px 0px rgba(0, 0, 0, 0.3);
+    }
+    
+    &.led--green {
+        background: $c-led-green;
+        box-shadow: 0 0px 10px $c-led-green;
+
+        box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.2) inset, 
+                    0 2px 0px rgba(255, 255, 255, 0.3), 
+                    0 -1px 0px rgba(0, 0, 0, 0.3);
+    }
+
+    &.led--yellow {
+        background: $c-led-yellow;
+        box-shadow: 0 0px 10px $c-led-yellow;
+
+        box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.2) inset, 
+                    0 2px 0px rgba(255, 255, 255, 0.3), 
+                    0 -1px 0px rgba(0, 0, 0, 0.3);
+    }
+
+    &.led--blue {
+        background: $c-led-blue;
+        box-shadow: 0 0px 10px $c-led-blue;
+        
+        box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.2) inset, 
+                    0 2px 0px rgba(255, 255, 255, 0.3), 
+                    0 -1px 0px rgba(0, 0, 0, 0.3);
+    }
+
+    &.led--blink {
+        animation-name: led-blink;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+    }
+}
+
+@keyframes led-fade {
+    0%,
+    33% {
+      background-color: none;
+    }
+    34%,
+    66% {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    67%,
+    100% {
+      background-color: none;
+    }
+}
+
+@keyframes led-blink {
+    0%,
+    50% {
+        background-color: none;
+    }
+    51%,
+    100% {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+}

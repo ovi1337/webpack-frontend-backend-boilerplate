@@ -1,28 +1,56 @@
-<mat-grid-list cols="12" [rowHeight]="'500px'">
+<mat-grid-list cols="12" [rowHeight]="rowHeight">
   <mat-grid-tile [colspan]="8" [rowspan]="1">
     <mat-card class="dashboard-card">
       <mat-card-content>
-        <div class="button-row">
-          <button-widget symbol="MAIN.LAMPE" caption="On" value="1"></button-widget>
+        <div class="row button-row">
           <button-widget symbol="MAIN.LAMPE" caption="Off" value="0"></button-widget>
+          <button-widget symbol="MAIN.LAMPE" caption="On" value="1"></button-widget>
         </div>
 
-        <div>
+        <div class="row">
           <toggle-widget symbol="MAIN.LAMPE" caption="Lampe"></toggle-widget>
         </div>
 
-        <div>
+        <div class="row">
           Lichtsensor:
           <progressbar-widget min="0" max="32767" symbol=".AI_LICHT_SENSOR"></progressbar-widget>
         </div>
-        
-        <div>
+
+        <div class="row">
           Temperatursensor:
           <progressbar-widget min="0" max="1000" symbol=".PT_TEMP_SENSOR"></progressbar-widget>
         </div>
-        
-        <div>
+
+        <div class="row">
           <slider-widget min="0" max="32767" step="1" symbol=".DIMMER"></slider-widget>
+        </div>
+
+        <div class="row button-row">
+          <button-widget symbol=".DIMMER" caption="0%" value="0"></button-widget>
+          <button-widget symbol=".DIMMER" caption="50%" value="16384"></button-widget>
+          <button-widget symbol=".DIMMER" caption="100%" value="32767"></button-widget>
+        </div>
+
+        <div class="row">
+          <mat-chip-list>
+            <status-widget symbol=".DI_TASTER" caption="Taster" colorTrue="warn"></status-widget>
+            <status-widget symbol=".DI_SCHALTER" caption="Schalter" colorTrue="warn"></status-widget>
+            <status-widget symbol=".DO_LAMPE_1" caption="Lampe" colorTrue="accent"></status-widget>
+          </mat-chip-list>
+        </div>
+
+        <div class="row">
+            <led-widget symbol=".DI_SCHALTER" caption="Schalter" color="blue"></led-widget>
+            <led-widget symbol=".DI_TASTER" caption="Taster" color="red"></led-widget>
+            <led-widget symbol=".DO_LAMPE_1" caption="Lampe" color="yellow"></led-widget>
+            <led-widget symbol="MAIN.LAMPE" caption="Test" color="green"></led-widget>
+
+            <led-widget symbol=".PT_TEMP_SENSOR" caption="Blink" color="blue" blink="true"></led-widget>
+        </div>
+
+        <div class="row">
+          <slider2-widget min="0" max="32767" step="1" symbol=".DIMMER" vertical="true"></slider2-widget>
+          <slider2-widget min="0" max="32767" step="1" symbol=".DIMMER" vertical="false"></slider2-widget>
         </div>
 
       </mat-card-content>
@@ -38,20 +66,7 @@
   <mat-grid-tile [colspan]="4" [rowspan]="1">
     <mat-card class="dashboard-card">
       <mat-card-content>
-        <table mat-table [dataSource]="getValues(symbols)" class="mat-elevation-z8">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef> SymbolName </th>
-            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-          </ng-container>
-
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef> Value </th>
-            <td mat-cell *matCellDef="let element"> {{element.value}} </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+        <symbol-list-widget></symbol-list-widget>
       </mat-card-content>
     </mat-card>
   </mat-grid-tile>

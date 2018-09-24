@@ -4,24 +4,13 @@
     display: inline-block;
 }
 
+.row {
+    margin: 10px 0;
+}
+
 progressbar-widget {
     padding-bottom: 5px;
     display: block;
-}
-
-table {
-    margin-bottom: 20px; 
-    //width: 400px;
-}
-
-td,
-th {
-    width: 25%;
-}
-
-tr.mat-row,
-tr.mat-header-row {
-    height: 34px;
 }
 
 .dashboard-card {
@@ -30,4 +19,9 @@ tr.mat-header-row {
     left: 15px;
     right: 15px;
     bottom: 15px;
+}
+
+led-widget {
+    min-width: 75px;
+    display: inline-flex;
 }

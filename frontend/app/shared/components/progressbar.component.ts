@@ -32,6 +32,6 @@ export class ProgressbarComponent implements OnInit, OnDestroy {
       return 0;
     }
 
-    return (this.max / (this.max - this.symbolService.symbols[this.symbol].value)) * 100 - 100
+    return (this.max / (this.max - this.symbolService.symbols[this.symbol].value)) * 100 - 100;
   }
 }

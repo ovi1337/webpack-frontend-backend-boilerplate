@@ -6,10 +6,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { WidgetsModule } from './shared/components/widgets.module';
+import { SystemState } from './shared/service/system.state';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -17,8 +19,11 @@ import { DashboardModule } from './dashboard/dashboard.module';
     AppRoutingModule,
     DashboardModule,
     SharedModule,
+    WidgetsModule,
   ],
-  providers: [],
+  providers: [
+    SystemState,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

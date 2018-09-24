@@ -3,7 +3,6 @@ import * as socketIo from 'socket.io';
 import * as http from 'http';
 import { Core } from './server/core';
 import { AddressInfo } from 'net';
-import { Plc } from './modules/Plc';
 import { Socket } from 'socket.io';
 
 export interface Module extends NodeModule {
@@ -40,7 +39,7 @@ export class Server {
             this.attachWebsocket(port);
 
             console.info(`==> 🌎 Listening on ${port}. Open up http://localhost:${port}/ in your browser.`);
-            
+
             if (Server.module.hot) {
                 this.attachHMR();
             }
@@ -52,26 +51,26 @@ export class Server {
 
         Server.io.on('connect', (socket: Socket) => {
             console.log('Connected client on port %s.', port);
-            
+
             this.attachSocketListeners(socket);
         });
     }
 
     private attachSocketListeners(socket: Socket): void {
-        socket.on('Data', (data: Symbol) => {
-            console.log('[server](Data): %s', JSON.stringify(data));
-            
+        socket.on('Symbol', (data: Symbol) => {
+            console.log('[server](Symbol): %s', JSON.stringify(data));
+
             Core.setSymbol(data);
         });
 
         socket.on('SymbolAccessList', (data: string[]) => {
             console.log('[server](SymbolAccessList): %s', JSON.stringify(data));
-            
+
             Core.updateSymbolAccessList(data);
         });
 
-        socket.on('disconnect', () => {
-            console.log('Client disconnected');
+        socket.on('disconnect', (client) => {
+            console.log('Client disconnected', client);
 
             Core.cleanupSymbolAccessList();
         });
